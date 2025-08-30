@@ -1,0 +1,599 @@
+:root {
+  --bg: #f7f8fa;
+  --panel: #ffffff;
+  --border: #e6e8eb;
+  --muted: #6b7280;
+  --text: #111827;
+  --primary: #00aaff;
+  --primary-ink: #047fae;
+  --note-bg: #ecfeff;
+  --note-ink: #047fae;
+  --radius: 8px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.06);
+  --gap: 10px;
+}
+
+html {
+  box-sizing: border-box;
+  overflow-y: scroll;
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+}
+
+/* Touch interactions optimization */
+@media (pointer: coarse) {
+  body,
+  .container,
+  #resultContainer,
+  .mobile-table,
+  .mobile-table .clickable,
+  .mobile-clickable {
+    touch-action: manipulation;
+  }
+}
+
+/* ===== CONTAINER & LAYOUT ===== */
+.container {
+  max-width: 1140px;
+  width: 100%;
+  padding: 0 16px;
+}
+
+h2 {
+  margin-top: 0;
+  text-align: center;
+}
+
+/* ===== FILTER BAR (STICKY) ===== */
+#filterBar {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: saturate(180%) blur(8px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  width: 100vw;
+}
+
+#filterControls {
+  max-width: 1140px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding-inline: 16px;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+}
+
+/* ===== SEARCH INPUT ===== */
+#searchInput {
+  flex: 1 1 auto;
+  min-width: 200px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  outline: none;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+#searchInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.15);
+}
+
+/* ===== NOTE TOGGLE BUTTON ===== */
+#noteToggle {
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--primary-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+#noteToggle:hover {
+  background: var(--note-bg);
+  border-color: var(--primary);
+}
+
+#noteToggle .toggle {
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: #eee;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+#noteToggle .toggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transition: left 0.2s ease, background 0.2s ease;
+}
+
+#noteToggle.active {
+  background: var(--note-bg);
+  border-color: rgba(0, 170, 255, 0.35);
+  box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.12);
+}
+
+#noteToggle.active .toggle {
+  background: rgba(0, 170, 255, 0.25);
+}
+
+#noteToggle.active .toggle::after {
+  left: 18px;
+  background: var(--primary);
+}
+
+/* ===== FETCH BUTTON CONTAINER ===== */
+#fetchBtnContainer {
+  max-width: 1140px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding-inline: 16px;
+}
+
+.fetch-btn {
+  background: var(--note-bg);
+  color: var(--primary-ink);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  display: block;
+  width: 100%;
+  min-width: 150px;
+  margin: 16px 0 8px 0;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s ease;
+}
+
+.fetch-btn:hover {
+  background: #e0f8ff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 170, 255, 0.2);
+}
+
+/* ===== RESULT CONTAINER ===== */
+#resultContainer {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  box-sizing: border-box;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin: 16px;
+}
+
+#resultContainer p {
+  margin: 0;
+  padding-left: 15px;
+  color: #666;
+}
+
+#resultContainer table {
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* ===== TABLE STYLES ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+#resultContainer:has(table) {
+  overflow-x: auto;
+  overflow-y: auto;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+#resultContainer:has(table) table {
+  min-width: 100%;
+}
+
+th,
+td {
+  padding: 8px 10px;
+  border: 1px solid #eee;
+  text-align: left;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+thead th {
+  background: #fafafa;
+  font-weight: bold;
+}
+
+/* ===== SPECIAL ROW STYLES ===== */
+.row-with-note {
+  background-color: #ecfeff !important;
+}
+
+.row-with-buyer {
+  background-color: #e8faff !important;
+}
+
+.row-with-buyer .machine-column .clickable {
+  background: #66e0ff !important;
+  color: #1f2937 !important;
+}
+
+.mobile-table .row-with-buyer .machine-column .clickable {
+  background: #66e0ff !important;
+  color: #1f2937 !important;
+}
+
+.row-with-buyer:hover {
+  background-color: #00ccff !important;
+}
+
+/* ===== CLICKABLE ELEMENTS ===== */
+.clickable {
+  cursor: pointer;
+  color: #0066cc;
+  text-decoration: underline;
+  transition: all 0.2s;
+}
+
+.clickable:hover {
+  color: #003366;
+}
+
+.clickable:active {
+  background-color: #e0e0e0;
+}
+
+.clickable.copied {
+  background-color: #4caf50 !important;
+  color: white !important;
+  text-decoration: none;
+}
+
+/* ===== MOBILE TABLE STYLES ===== */
+.mobile-table th,
+.mobile-table td {
+  text-align: center;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-table th:nth-child(1),
+.mobile-table td:nth-child(1) {
+  width: 25%;
+}
+
+.mobile-table th:nth-child(2),
+.mobile-table td:nth-child(2) {
+  width: 25%;
+}
+
+.mobile-table th:nth-child(3),
+.mobile-table td:nth-child(3) {
+  width: 50%;
+}
+
+.mobile-table th:nth-child(4),
+.mobile-table td:nth-child(4) {
+  width: 0%;
+  padding: 0;
+  border: none;
+}
+
+.mobile-table .machine-column {
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.6;
+  min-height: 44px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.mobile-table .machine-column .clickable {
+  margin: 2px;
+  padding: 4px 6px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  display: inline-block;
+  min-width: 30px;
+  text-align: center;
+  color: #333;
+  text-decoration: none;
+}
+
+.mobile-clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mobile-clickable:hover {
+  background-color: #f5f5f5;
+}
+
+.mobile-clickable:active {
+  background-color: #e0e0e0;
+}
+
+/* ===== DESKTOP CLICKABLE STYLES ===== */
+.desktop-clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.desktop-clickable:hover {
+  background-color: #f5f5f5;
+}
+
+.desktop-clickable:active {
+  background-color: #e0e0e0;
+}
+
+.machine-column .clickable {
+  margin: 2px;
+  padding: 4px 6px;
+  background: #f0f0f0;
+  border-radius: 3px;
+  display: inline-block;
+  min-width: 30px;
+  text-align: center;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.machine-column .clickable:hover {
+  background: #e0e0e0;
+}
+
+.machine-column .clickable:active {
+  background: #d0d0d0;
+}
+
+/* ===== MODAL STYLES ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 16px;
+  border: 1px solid #888;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 8px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #000;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeOutUpModal {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+}
+
+@keyframes fadeOutBackdrop {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.modal.swipe-dismiss .modal-content {
+  animation: fadeOutUpModal 200ms ease forwards;
+}
+
+.modal.swipe-dismiss {
+  animation: fadeOutBackdrop 200ms ease forwards;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+/* 
+  BREAKPOINT CHUẨN: Điện thoại chuẩn (636 x 1257)
+  - Dưới mốc này: Mobile nhỏ
+  - Trên mốc này: Tablet/Desktop
+*/
+
+/* ===== MOBILE NHỎ (từ 769px trên) ===== */
+@media (max-width: 769px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  #filterControls {
+    gap: 8px;
+    justify-content: flex-start;
+    padding-inline: 16px;
+    margin-bottom: 16px;
+  }
+
+  #searchInput {
+    min-width: 140px;
+    max-width: none;
+    flex: 1 1;
+    order: 1;
+    padding: 8px 12px;
+    font-size: 16px; /* Tránh zoom trên iOS */
+  }
+
+  #noteToggle {
+    order: 2;
+    flex-shrink: 0;
+    margin-right: auto;
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  .fetch-btn {
+    order: 3;
+    margin: 16px 0;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  /* Mobile table optimizations */
+  .mobile-only {
+    display: table-cell;
+  }
+  .desktop-only {
+    display: none;
+  }
+
+  table {
+    font-size: 14px;
+  }
+  th,
+  td {
+    padding: 6px 8px;
+  }
+
+  .modal-content {
+    width: calc(100% - 40px);
+    max-width: 80%;
+    max-height: calc(100vh - 40px);
+    border-radius: 12px;
+    padding: 25px;
+  }
+
+  .modal {
+    touch-action: pan-y;
+  }
+
+  #resultContainer {
+    margin: 16px 0;
+  }
+}
+
+/* ===== TABLET & DESKTOP (dưới 768px) ===== */
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none;
+  }
+  .desktop-only {
+    display: table-cell;
+  }
+
+  .desktop-only .clickable {
+    cursor: pointer;
+    color: #0066cc;
+    text-decoration: underline;
+  }
+
+  .desktop-only .clickable:hover {
+    color: #003366;
+  }
+
+  /* Enhanced desktop interactions */
+  input {
+    font-size: 14px;
+  }
+  li {
+    font-size: 15px;
+  }
+  table {
+    font-size: 14px;
+  }
+  th,
+  td {
+    padding: 8px 10px;
+  }
+
+  /* Read more button */
+  .read-more-btn {
+    background: #0066cc;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .read-more-btn:hover {
+    background: #003366;
+  }
+}
