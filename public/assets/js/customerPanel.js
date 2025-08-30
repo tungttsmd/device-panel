@@ -51,6 +51,7 @@ class CustomerPanelApp {
     document.querySelectorAll("#detailModal .close").forEach((el) =>
       el.addEventListener("click", () => {
         document.getElementById("detailModal").style.display = "none";
+        document.body.style.overflow = ""; 
       })
     );
     document.querySelectorAll("#deviceModal .close").forEach((el) =>
@@ -240,6 +241,7 @@ class CustomerPanelApp {
       });
     });
     document.getElementById("detailModal").style.display = "block";
+    document.body.style.overflow = "hidden";
   }
 
   showDeviceModal(device) {
@@ -276,10 +278,25 @@ class CustomerPanelApp {
                     <td><strong>Nguồn:</strong></td>
                     <td colspan="3">
                         <span>${device.power || "--"}</span>
+                        <span style="float: right; color: #0066cc; cursor: pointer; text-decoration: underline;" 
+                              class="clickable" 
+                              data-copy="${this.formatDeviceNotice(device.chip || "", device.main || "")}">
+                            Thông báo máy
+                        </span>
                     </td>
                 </tr>
             </table>
         `;
+    
+    // Thêm event listener cho "Thông báo máy" để copy clipboard
+    const noticeEl = deviceContent.querySelector("[data-copy]");
+    if (noticeEl) {
+      noticeEl.addEventListener("click", (e) => {
+        const text = e.target.getAttribute("data-copy");
+        this.copyWithFeedback(e, text);
+      });
+    }
+    
     document.getElementById("deviceModal").style.display = "block";
   }
 
@@ -290,7 +307,6 @@ class CustomerPanelApp {
     const THRESHOLD = 100;
     let startY = null;
     let lastY = null;
-    let startedInContent = false;
     modal.addEventListener(
       "touchstart",
       (e) => {
@@ -298,7 +314,6 @@ class CustomerPanelApp {
         const touch = e.touches[0];
         startY = touch.clientY;
         lastY = startY;
-        startedInContent = content && content.contains(e.target);
       },
       { passive: true }
     );
@@ -318,7 +333,7 @@ class CustomerPanelApp {
       }
       const deltaY = startY - lastY;
       const isSwipeUp = deltaY > THRESHOLD;
-      if (isSwipeUp && startedInContent) {
+      if (isSwipeUp) {
         modal.classList.add("swipe-dismiss");
         const onAnimEnd = () => {
           modal.removeEventListener("animationend", onAnimEnd);
@@ -329,7 +344,6 @@ class CustomerPanelApp {
       }
       startY = null;
       lastY = null;
-      startedInContent = false;
     });
   }
 
@@ -418,6 +432,36 @@ class CustomerPanelApp {
     }
     
     this.renderInfo(foundList);
+  }
+
+  formatDeviceNotice(chip, main) {
+    if (!chip) return "";
+    
+    const chipLast4 = chip.slice(-4);
+    const mainLower = (main || "").trim().toLowerCase();
+    
+    // Logic format theo yêu cầu
+    if (/x10/i.test(mainLower)) {
+      return `X10X99 ${chipLast4} dual`;
+    }
+    if (/f8d/i.test(mainLower)) {
+      return `F8D ${chipLast4} dual`;
+    }
+    if (/oem/i.test(mainLower)) {
+      return `OEM ${chipLast4} dual`;
+    }
+    if (/đơn/i.test(mainLower)) {
+      if (/td4/i.test(mainLower)) {
+        return `TD4 ${chipLast4} đơn`;
+      } else if (/tfq/i.test(mainLower)) {
+        return `TFQ ${chipLast4} đơn`;
+      } else {
+        return `HD4 ${chipLast4} đơn`;
+      }
+    }
+    
+    // Fallback: chip dual
+    return `${chipLast4} dual`;
   }
 }
 

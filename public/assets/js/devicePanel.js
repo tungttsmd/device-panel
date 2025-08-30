@@ -3,11 +3,22 @@ class DeviceFormatter {
     if (!chipStr) return "";
     const chip = chipStr.slice(-4);
     const main = (mainStr || "").trim().toLowerCase();
-    if (/x10/i.test(main)) return "X10X99";
-    if (/f8d/i.test(main)) return "F8D";
-    if (/oem/i.test(main)) return "OEM";
-    if (/td4/i.test(main)) return "TD4";
-    if (/đơn/i.test(main)) return "HD4";
+    
+    // Logic format theo yêu cầu
+    if (/x10/i.test(main)) return `X10X99`;
+    if (/f8d/i.test(main)) return `F8Dl`;
+    if (/oem/i.test(main)) return `OEM`;
+    if (/đơn/i.test(main)) {
+      if (/td4/i.test(main)) {
+        return `TD4`;
+      } else if (/tfq/i.test(main)) {
+        return `TFQ`;
+      } else {
+        return `HD4`;
+      }
+    }
+    
+    // Fallback: chip dual
     return `${chip} dual`;
   }
 }
